@@ -8,4 +8,4 @@ version = "1.0.0"
 
 [tool.vercel]
 
-entrypoint = "crop_ai.asgi:application"
+entrypoint = "crop_ai.wsgi:application"
