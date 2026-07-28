@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Weather Prediction{% endblock %}
+{% block nav_weather %}active{% endblock %}
+{% block page_title %}<span>🌤️</span> Weather-Based Prediction{% endblock %}
+
+{% block content %}
+<div style="max-width:720px;margin:0 auto;">
+
+    <!-- Search Card -->
+    <div class="card" style="margin-bottom:24px;">
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Real-Time Prediction</h2>
+        <p style="color:#64748b;font-size:14px;margin-bottom:28px;">
+            Enter a city name to fetch current weather data and get an instant crop recommendation.
+        </p>
+
+        <form method="GET" id="weatherForm">
+            <div style="display:flex; gap:12px;">
+                <input 
+                    type="text" 
+                    name="city" 
+                    class="form-input" 
+                    placeholder="Enter city name (e.g. Madurai, London)" 
+                    value="{{ city }}" 
+                    required
+                >
+                <button type="submit" class="btn btn-primary" style="white-space:nowrap;">
+                    🔍 Get Prediction
+                </button>
+            </div>
+        </form>
+
+        {% if error %}
+        <div class="alert alert-error" style="margin-top:20px;">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if result %}
+    <!-- Weather Info -->
+    <div class="grid-3" style="margin-bottom:24px;">
+        <div class="card" style="text-align:center; padding:16px;">
+            <div style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Temperature</div>
+            <div style="font-size:24px; font-weight:700; color:var(--green-light); margin-top:4px;">{{ weather.temp }}°C</div>
+        </div>
+        <div class="card" style="text-align:center; padding:16px;">
+            <div style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Rainfall</div>
+            <div style="font-size:24px; font-weight:700; color:#3b82f6; margin-top:4px;">{{ weather.rain }}mm</div>
+        </div>
+        <div class="card" style="text-align:center; padding:16px;">
+            <div style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Humidity</div>
+            <div style="font-size:24px; font-weight:700; color:#f59e0b; margin-top:4px;">{{ weather.hum }}%</div>
+        </div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="card result-card" style="margin-bottom:24px; border-color:{{ recommendation.color }}44;">
+        <span class="result-icon">
+            {{ recommendation.emoji }}
+        </span>
+        <div class="result-label">Recommended for {{ weather.city|title }}</div>
+        <div class="result-crop" style="background: linear-gradient(135deg, {{ recommendation.color }}, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            {{ result }}
+        </div>
+
+        <p style="color:var(--text-secondary); font-size:14px; margin-top:12px; max-width:400px; margin-left:auto; margin-right:auto;">
+            Based on current conditions in <strong>{{ weather.city|title }}</strong>, {{ result }} is the most suitable crop to cultivate.
+        </p>
+
+        <div style="margin-top:24px; display:flex; gap:12px; justify-content:center;">
+            <a href="{% url 'history' %}" class="btn btn-ghost">View History</a>
+            <a href="{% url 'weather_predict' %}" class="btn btn-primary">New Search</a>
+        </div>
+    </div>
+
+    <!-- Recommendation Panel -->
+    {% if recommendation %}
+    <div class="card" style="
+        margin-bottom:24px;
+        border-color:{{ recommendation.color }}44;
+        box-shadow:0 0 30px {{ recommendation.glow }};
+    ">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="
+                width:52px;height:52px;
+                background:{{ recommendation.glow }};
+                border:1px solid {{ recommendation.color }}44;
+                border-radius:14px;
+                display:flex;align-items:center;justify-content:center;
+                font-size:28px;
+            ">{{ recommendation.emoji }}</div>
+            <div>
+                <div style="font-size:18px;font-weight:700;color:#f0fdf4;">{{ result }} Growing Guide</div>
+                <div style="font-size:13px;color:#64748b;margin-top:2px;">Expert recommendations for these conditions</div>
+            </div>
+        </div>
+
+        <div class="card-title" style="margin-bottom:14px;">📌 Quick Tips</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+            {% for tip in recommendation.tips|slice:":3" %}
+            <li style="
+                display:flex;align-items:flex-start;gap:12px;
+                padding:12px 16px;
+                background:{{ recommendation.glow }};
+                border-radius:10px;
+                border-left:3px solid {{ recommendation.color }};
+                font-size:14px;color:#cbd5e1;
+            ">
+                {{ tip }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Info Card -->
+    {% if not result %}
+    <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">How it works</div>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; gap:16px; align-items:flex-start;">
+                <div style="width:32px; height:32px; border-radius:50%; background:var(--green-glow); color:var(--green); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">1</div>
+                <div>
+                    <div style="font-weight:600; margin-bottom:4px;">Fetch Live Data</div>
+                    <p style="font-size:13px; color:var(--text-secondary);">We use OpenWeather API to get real-time temperature, rainfall, and humidity for your city.</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:16px; align-items:flex-start;">
+                <div style="width:32px; height:32px; border-radius:50%; background:var(--green-glow); color:var(--green); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">2</div>
+                <div>
+                    <div style="font-weight:600; margin-bottom:4px;">AI Analysis</div>
+                    <p style="font-size:13px; color:var(--text-secondary);">Our prediction engine processes the environmental factors to determine the best crop.</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:16px; align-items:flex-start;">
+                <div style="width:32px; height:32px; border-radius:50%; background:var(--green-glow); color:var(--green); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">3</div>
+                <div>
+                    <div style="font-weight:600; margin-bottom:4px;">Save & Export</div>
+                    <p style="font-size:13px; color:var(--text-secondary);">All predictions are saved to your account history automatically.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+document.getElementById('weatherForm').addEventListener('submit', function() {
+    const btn = this.querySelector('button');
+    btn.innerHTML = '⏳ Fetching…';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

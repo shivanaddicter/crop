@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block page_title %}<span>📊</span> Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Header / Greeting -->
+<div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
+  <div>
+    <h2 style="font-size:28px; font-weight:800; letter-spacing:-0.5px;">Welcome back, {{ user.username }}! 👋</h2>
+    <p style="color:var(--text-secondary); font-size:15px; margin-top:4px;">Here is what's happening with your crops today.</p>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:13px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Current Date</div>
+    <div style="font-size:16px; font-weight:700; color:var(--green-light); margin-top:2px;">{{ "now"|date:"l, M d, Y" }}</div>
+  </div>
+</div>
+
+<!-- Stat row -->
+<div class="grid-4" style="margin-bottom:24px;">
+
+  <div class="card stat-card">
+    <div class="stat-icon">📈</div>
+    <div class="card-title">Total Activity</div>
+    <div class="stat-num">{{ total }}</div>
+    <div class="stat-sub">Predictions made</div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon">🌡️</div>
+    <div class="card-title">Avg. Temperature</div>
+    <div class="stat-num">
+      {% if avgs.avg_temp %}{{ avgs.avg_temp|floatformat:1 }}°C{% else %}—{% endif %}
+    </div>
+    <div class="stat-sub">Historical mean</div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon">🌧️</div>
+    <div class="card-title">Avg. Rainfall</div>
+    <div class="stat-num">
+      {% if avgs.avg_rain %}{{ avgs.avg_rain|floatformat:0 }}mm{% else %}—{% endif %}
+    </div>
+    <div class="stat-sub">Historical mean</div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon">🏆</div>
+    <div class="card-title">Top Predicted</div>
+    <div class="stat-num" style="font-size:26px;">
+      {% if most_predicted %}
+        {% if most_predicted == "Rice" %}🌾
+        {% elif most_predicted == "Sugarcane" %}🎋
+        {% elif most_predicted == "Maize" %}🌽
+        {% else %}🌿{% endif %}
+        {{ most_predicted }}
+      {% else %}—{% endif %}
+    </div>
+    <div class="stat-sub">Most frequent result</div>
+  </div>
+
+</div>
+
+<!-- Insights row -->
+<div class="card" style="margin-bottom:24px; background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(2,12,20,0.4)); border-color: rgba(34,197,94,0.2); position: relative; overflow: hidden;">
+  <div style="position: absolute; top: -20px; right: -20px; font-size: 80px; opacity: 0.05; pointer-events: none;">💡</div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div style="width:48px; height:48px; background:rgba(34,197,94,0.15); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px;">🤖</div>
+    <div>
+      <div class="card-title" style="margin:0; color:var(--green-light);">AgriSense AI Insight</div>
+      <p style="font-size:15px; margin-top:4px; color:var(--text-primary);">
+        {% if most_predicted == "Rice" %}
+          Your history shows a high frequency of Rice predictions. Consider implementing <strong>System of Rice Intensification (SRI)</strong> to reduce water usage by up to 50%.
+        {% elif most_predicted == "Sugarcane" %}
+          Sugarcane requires high nitrogen. Try <strong>intercropping with legumes</strong> to naturally fix nitrogen in the soil and improve your yield.
+        {% elif most_predicted == "Maize" %}
+          Maize is sensitive to moisture stress. Ensure <strong>mulching</strong> is applied during dry spells to retain soil moisture and prevent stalk rot.
+        {% elif most_predicted == "Wheat" %}
+          Wheat thrives in cooler conditions. Monitor for <strong>yellow rust</strong> early in the season, especially if humidity stays above 70% for extended periods.
+        {% else %}
+          Start making predictions to unlock personalized AI-driven agricultural insights for your field conditions.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Charts row -->
+<div class="grid-2" style="margin-bottom:24px;">
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:16px;">Rainfall & Temperature — Last 10 Records</div>
+    <canvas id="barChart" height="200"
+            data-labels="{{ labels|safe }}"
+            data-temps="{{ temps|safe }}"
+            data-rains="{{ rains|safe }}"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:16px;">Crop Distribution</div>
+    <canvas id="pieChart" height="200"
+            data-crop-labels="{{ crop_labels|safe }}"
+            data-crop-counts="{{ crop_counts|safe }}"></canvas>
+  </div>
+
+</div>
+
+<!-- Recent records table -->
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div class="card-title" style="margin:0;">Recent Records</div>
+    <a href="{% url 'history' %}" class="btn btn-ghost" style="font-size:13px;padding:8px 16px;">View All →</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Crop</th>
+          <th>Temperature (°C)</th>
+          <th>Rainfall (mm)</th>
+          <th>Humidity (%)</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in data|slice:":8" %}
+        <tr>
+          <td>
+            <span class="badge
+              {% if d.result == 'Rice' %}badge-blue
+              {% elif d.result == 'Sugarcane' %}badge-amber
+              {% elif d.result == 'Maize' %}badge-rose
+              {% else %}badge-green{% endif %}">
+              {% if d.result == "Rice" %}🌾
+              {% elif d.result == "Sugarcane" %}🎋
+              {% elif d.result == "Maize" %}🌽
+              {% else %}🌿{% endif %}
+              {{ d.result }}
+            </span>
+          </td>
+          <td>{{ d.temperature }}</td>
+          <td>{{ d.rainfall }}</td>
+          <td>{{ d.humidity }}</td>
+          <td style="color:#64748b;">{{ d.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;padding:32px;color:#475569;">
+          No predictions yet. <a href="{% url 'predict' %}" style="color:#22c55e;">Make your first prediction →</a>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+  @media (max-width: 1100px) { .grid-4 { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 600px)  { .grid-4 { grid-template-columns: 1fr; } }
+
+  .stat-card { position: relative; overflow: hidden; }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    background: var(--green-glow);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .stat-icon { font-size: 22px; margin-bottom: 8px; }
+</style>
+
+<script>
+const chartDefaults = { color: '#94a3b8', font: { family: 'Inter', size: 12 } };
+Chart.defaults.color = chartDefaults.color;
+Chart.defaults.font  = chartDefaults.font;
+const gridColor = 'rgba(255,255,255,0.06)';
+
+// Read data from data attributes
+const barChart = document.getElementById('barChart');
+const pieChart = document.getElementById('pieChart');
+
+const labels = barChart ? JSON.parse(barChart.dataset.labels || '[]') : [];
+const temps = barChart ? JSON.parse(barChart.dataset.temps || '[]') : [];
+const rains = barChart ? JSON.parse(barChart.dataset.rains || '[]') : [];
+const cropLabels = pieChart ? JSON.parse(pieChart.dataset.cropLabels || '[]') : [];
+const cropCounts = pieChart ? JSON.parse(pieChart.dataset.cropCounts || '[]') : [];
+
+// Only render bar chart if there's data
+if (labels.length > 0 && barChart) {
+  new Chart(barChart, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Rainfall (mm)',
+        data: rains,
+        backgroundColor: 'rgba(34,197,94,0.5)',
+        borderColor: '#22c55e',
+        borderWidth: 2,
+        borderRadius: 6,
+      },{
+        label: 'Temperature (°C)',
+        data: temps,
+        backgroundColor: 'rgba(59,130,246,0.4)',
+        borderColor: '#3b82f6',
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { color: gridColor } },
+        y: { grid: { color: gridColor } }
+      }
+    }
+  });
+}
+
+// Only render pie chart if there's data
+if (cropLabels.length > 0 && pieChart) {
+  new Chart(pieChart, {
+    type: 'doughnut',
+    data: {
+      labels: cropLabels,
+      datasets: [{
+        data: cropCounts,
+        backgroundColor: ['rgba(34,197,94,0.7)','rgba(59,130,246,0.7)','rgba(245,158,11,0.7)','rgba(244,63,94,0.7)'],
+        borderColor: ['#22c55e','#3b82f6','#f59e0b','#f43f5e'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '65%',
+      plugins: { legend: { position: 'right' } }
+    }
+  });
+}
+</script>
+
+{% endblock %}

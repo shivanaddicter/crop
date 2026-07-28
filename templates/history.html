@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}Prediction History{% endblock %}
+{% block nav_history %}active{% endblock %}
+{% block page_title %}<span>📋</span> Prediction History{% endblock %}
+
+{% block content %}
+
+<!-- Delete-All Confirmation Modal -->
+<div id="deleteAllModal" style="
+    display:none;
+    position:fixed;inset:0;z-index:999;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(6px);
+    align-items:center;justify-content:center;
+">
+  <div style="
+      background:#0d1f2d;
+      border:1px solid rgba(239,68,68,0.35);
+      border-radius:16px;
+      padding:36px;
+      max-width:400px;width:90%;
+      box-shadow:0 0 40px rgba(239,68,68,0.2);
+      text-align:center;
+      animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  ">
+    <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:8px;">Delete All Records?</div>
+    <p style="color:#94a3b8;font-size:14px;margin-bottom:28px;">
+      This will permanently remove <strong style="color:#f87171;">all {{ data|length }} record(s)</strong> from your history. This action cannot be undone.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="closeModal()" class="btn btn-ghost">Cancel</button>
+      <form method="POST" action="{% url 'delete_all_history' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" style="background:rgba(239,68,68,0.85);color:#fff;border:none;">
+          🗑️ Yes, Delete All
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Single Delete Modal -->
+<div id="deleteSingleModal" style="
+    display:none;
+    position:fixed;inset:0;z-index:999;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(6px);
+    align-items:center;justify-content:center;
+">
+  <div style="
+      background:#0d1f2d;
+      border:1px solid rgba(239,68,68,0.35);
+      border-radius:16px;
+      padding:36px;
+      max-width:380px;width:90%;
+      box-shadow:0 0 40px rgba(239,68,68,0.2);
+      text-align:center;
+      animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  ">
+    <div style="font-size:48px;margin-bottom:12px;">🗑️</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:8px;">Delete Record?</div>
+    <p style="color:#94a3b8;font-size:14px;margin-bottom:28px;">
+      Are you sure you want to delete this prediction record?
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button onclick="closeSingleModal()" class="btn btn-ghost">Cancel</button>
+      <form id="deleteSingleForm" method="POST" action="" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" style="background:rgba(239,68,68,0.85);color:#fff;border:none;">
+          Delete
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card" style="margin-bottom:20px;">
+  <form method="GET" style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+    <div class="form-group" style="margin-bottom:0;flex:1;min-width:160px;">
+      <label class="form-label">From Date</label>
+      <input type="date" name="from" class="form-input" value="{{ from_date }}">
+    </div>
+    <div class="form-group" style="margin-bottom:0;flex:1;min-width:160px;">
+      <label class="form-label">To Date</label>
+      <input type="date" name="to" class="form-input" value="{{ to_date }}">
+    </div>
+    <button type="submit" class="btn btn-primary" style="height:48px;">🔍 Filter</button>
+    <a href="{% url 'history' %}" class="btn btn-ghost" style="height:48px;">Clear</a>
+    <a href="{% url 'export_csv' %}" class="btn btn-ghost" style="height:48px;">⬇️ Export CSV</a>
+  </form>
+</div>
+
+<!-- Table Card -->
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <div class="card-title" style="margin:0;">
+      {{ data|length }} Record{% if data|length != 1 %}s{% endif %}
+    </div>
+    {% if data %}
+    <button
+      onclick="openModal()"
+      class="btn btn-danger"
+      style="font-size:13px;padding:9px 18px;"
+    >
+      🗑️ Delete All
+    </button>
+    {% endif %}
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Crop</th>
+          <th>Temperature (°C)</th>
+          <th>Rainfall (mm)</th>
+          <th>Humidity (%)</th>
+          <th>Date &amp; Time</th>
+          <th style="text-align:center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in data %}
+        <tr id="row-{{ d.id }}">
+          <td style="color:#475569;">{{ forloop.counter }}</td>
+          <td>
+            <span class="badge
+              {% if d.result == 'Rice' %}badge-blue
+              {% elif d.result == 'Sugarcane' %}badge-amber
+              {% elif d.result == 'Maize' %}badge-rose
+              {% else %}badge-green{% endif %}">
+              {% if d.result == "Rice" %}🌾
+              {% elif d.result == "Sugarcane" %}🎋
+              {% elif d.result == "Maize" %}🌽
+              {% else %}🌿{% endif %}
+              {{ d.result }}
+            </span>
+          </td>
+          <td>{{ d.temperature }}</td>
+          <td>{{ d.rainfall }}</td>
+          <td>{{ d.humidity }}</td>
+          <td style="color:#64748b;">{{ d.created_at|date:"M d, Y · h:i A" }}</td>
+          <td style="text-align:center;">
+            <button
+              onclick="openSingleModal('{% url 'delete_record' d.id %}')"
+              class="btn btn-danger"
+              style="padding:6px 14px;font-size:12px;"
+              title="Delete record"
+            >
+              🗑️
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align:center;padding:40px;color:#475569;">
+            No records found. <a href="{% url 'predict' %}" style="color:#22c55e;">Make a prediction →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  /* ── Modal helpers ── */
+  function openModal() {
+    const m = document.getElementById('deleteAllModal');
+    m.style.display = 'flex';
+  }
+  function closeModal() {
+    document.getElementById('deleteAllModal').style.display = 'none';
+  }
+  function openSingleModal(actionUrl) {
+    document.getElementById('deleteSingleForm').action = actionUrl;
+    const m = document.getElementById('deleteSingleModal');
+    m.style.display = 'flex';
+  }
+  function closeSingleModal() {
+    document.getElementById('deleteSingleModal').style.display = 'none';
+  }
+  /* close on backdrop click */
+  ['deleteAllModal','deleteSingleModal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+  });
+</script>
+
+{% endblock %}

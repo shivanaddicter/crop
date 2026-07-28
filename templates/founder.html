@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Founder{% endblock %}
+{% block nav_founder %}active{% endblock %}
+{% block page_title %}<span>👤</span> About the Founder{% endblock %}
+
+{% block content %}
+<div class="founder-container" style="max-width: 1000px; margin: 0 auto; animation: fadeIn 0.8s ease-out;">
+    
+    <!-- Hero Section -->
+    <div class="card founder-hero" style="display: flex; gap: 40px; align-items: center; padding: 40px; margin-bottom: 30px; position: relative; overflow: hidden;">
+        <div class="glow-orb" style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: var(--green-glow); filter: blur(60px); border-radius: 50%; z-index: 0;"></div>
+        
+        <div class="founder-image-wrapper" style="flex-shrink: 0; position: relative; z-index: 1;">
+            <div style="width: 280px; height: 350px; border-radius: 20px; overflow: hidden; border: 2px solid var(--border-hover); box-shadow: 0 0 30px var(--green-glow); background: var(--bg-deep); display: flex; align-items: center; justify-content: center;">
+                <!-- We use onerror to show a fallback if the image isn't saved yet -->
+                <img src="{% static 'images/founder.jpg' %}" alt="Hariprasath L" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; document.getElementById('fallback-img').style.display='block';">
+                <div id="fallback-img" style="display: none; text-align: center; color: var(--text-muted); padding: 20px;">
+                    <div style="font-size: 64px; margin-bottom: 10px;">👤</div>
+                    <div style="font-size: 14px;">Please save your photo as<br><b>app/static/images/founder.jpg</b></div>
+                </div>
+            </div>
+            <div style="position: absolute; bottom: -15px; right: -15px; background: var(--green); color: white; padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 15px rgba(34,197,94,0.4);">
+                Founder & Developer
+            </div>
+        </div>
+
+        <div class="founder-info" style="flex-grow: 1; z-index: 1;">
+            <h1 style="font-size: 42px; font-weight: 800; margin-bottom: 10px; background: linear-gradient(135deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">HARIPRASATH L</h1>
+            <p style="font-size: 18px; color: var(--green-light); font-weight: 600; margin-bottom: 20px;">Full Stack Developer & AI/DS Student</p>
+            
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; font-size: 15px;">
+                Enthusiastic and driven 2nd year B.Tech student specializing in Artificial Intelligence and Data Science, with hands-on experience in full stack web development using Python. Actively engaged in hackathons, workshops, and technical symposiums. Strong foundation in programming, problem-solving, and building real-world applications.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px; font-size: 14px; color: var(--text-muted);">
+                <div style="display: flex; align-items: center; gap: 8px;"><span>📍</span> Madurai, Tamil Nadu</div>
+                <div style="display: flex; align-items: center; gap: 8px;"><span>📧</span> <a href="mailto:hariprasath72788@gmail.com" style="color: var(--green-light); text-decoration: none;">hariprasath72788@gmail.com</a></div>
+            </div>
+
+            <div class="social-links" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="https://github.com/shivanaddicter" target="_blank" class="social-btn" title="GitHub"><span>📁</span> GitHub</a>
+                <a href="https://www.linkedin.com/in/hariprasath-l-5b6b40312" target="_blank" class="social-btn" title="LinkedIn"><span>💼</span> LinkedIn</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        
+        <!-- Left Column -->
+        <div style="display: flex; flex-direction: column; gap: 30px;">
+            
+            <!-- Education -->
+            <div class="card detail-card">
+                <h3 class="section-title"><span style="color: var(--green);">🎓</span> Education</h3>
+                
+                <div class="timeline-item">
+                    <div class="timeline-title">B.Tech – Artificial Intelligence & Data Science</div>
+                    <div class="timeline-subtitle">NPR College of Engineering and Technology, Madurai</div>
+                    <div class="timeline-date">Batch: 2024 – 2028 (2nd Year)</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-title">Higher Secondary (12th Grade)</div>
+                    <div class="timeline-subtitle">Elango Corporation Hr. Sec. School, Madurai</div>
+                    <div class="timeline-date">2024</div>
+                </div>
+                
+                <div class="timeline-item" style="border-left-color: transparent;">
+                    <div class="timeline-title">Secondary School (10th Grade)</div>
+                    <div class="timeline-subtitle">Nadar Saraswathi Boys Hr. Sec. School</div>
+                    <div class="timeline-date">2022</div>
+                </div>
+            </div>
+
+            <!-- Technical Skills -->
+            <div class="card detail-card">
+                <h3 class="section-title"><span style="color: var(--green);">🛠️</span> Technical Skills</h3>
+                
+                <div class="skill-group">
+                    <span class="skill-label">Programming:</span>
+                    <span class="skill-value">Python, Java</span>
+                </div>
+                <div class="skill-group">
+                    <span class="skill-label">Frontend:</span>
+                    <span class="skill-value">HTML, CSS, JavaScript, Bootstrap, jQuery</span>
+                </div>
+                <div class="skill-group">
+                    <span class="skill-label">Frameworks:</span>
+                    <span class="skill-value">Flask, Django</span>
+                </div>
+                <div class="skill-group">
+                    <span class="skill-label">Database:</span>
+                    <span class="skill-value">MySQL, MongoDB</span>
+                </div>
+                <div class="skill-group">
+                    <span class="skill-label">Tools & Concepts:</span>
+                    <span class="skill-value">Full Stack Development, Basic AI & Data Analytics</span>
+                </div>
+            </div>
+
+            <!-- Strengths -->
+            <div class="card detail-card" style="background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(2,12,20,0.1));">
+                <h3 class="section-title"><span style="color: var(--green);">💪</span> Strengths</h3>
+                <ul class="bullet-list">
+                    <li>Strong problem-solving ability</li>
+                    <li>Quick learner and adaptable</li>
+                    <li>Team collaboration in hackathons</li>
+                    <li>Passion for AI & Software Development</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Right Column -->
+        <div style="display: flex; flex-direction: column; gap: 30px;">
+
+            <!-- Certifications -->
+            <div class="card detail-card">
+                <h3 class="section-title"><span style="color: var(--green);">📜</span> Certifications</h3>
+                <ul class="bullet-list">
+                    <li><strong>Python Programming (96 Hours)</strong> – MSME Technology Development Centre, Madurai (2024)</li>
+                    <li><strong>Java Programming (96 Hours)</strong> – MSME Technology Development Centre, Madurai (2024)</li>
+                    <li><strong>Python Course</strong> – Sai Institute of Computer Training (2024)</li>
+                    <li><strong>Data Analytics & AI Tools</strong> – Reccsar Pvt. Ltd (2026)</li>
+                </ul>
+            </div>
+
+            <!-- Hackathons & Events -->
+            <div class="card detail-card">
+                <h3 class="section-title"><span style="color: var(--green);">🚀</span> Hackathons & Events</h3>
+                <ul class="bullet-list">
+                    <li>24-Hour Hackathon (Code Redemption) – Jai Shriram Engineering College (2025)</li>
+                    <li>Appathon – Sri Eshwar College of Engineering (THIRAN 2026)</li>
+                    <li>Advanced VLSI Workshop – Kongunadu College of Engineering (2025)</li>
+                    <li>CDIO Project-Based Learning Training – NPR College R&D Cell (2025)</li>
+                    <li>NEURAVERSE’26 National Level Symposium – Sethu Institute of Technology</li>
+                    <li>ULTRIZ’25 National Level Technical Symposium</li>
+                    <li>Science Tech Fest 2025 – Dhanalakshmi Srinivasan University</li>
+                </ul>
+            </div>
+
+            <!-- Achievements -->
+            <div class="card detail-card">
+                <h3 class="section-title"><span style="color: var(--green);">🏆</span> Achievements</h3>
+                <div style="display: flex; align-items: center; gap: 12px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); padding: 15px; border-radius: 12px;">
+                    <div style="font-size: 32px;">🥈</div>
+                    <div>
+                        <div style="font-weight: 700; color: #fcd34d;">Runner-Up – Tech Quiz</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">ULTRIZ’25 National Level Symposium</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="card detail-card">
+                <h3 class="section-title"><span style="color: var(--green);">💼</span> Key Projects</h3>
+                <ul class="bullet-list">
+                    <li><strong>Crop Yield Predictor (AgriSense):</strong> Developed an AI-powered full stack web application using Django to recommend optimal crops based on soil and weather data.</li>
+                    <li><strong>Full Stack Web Applications:</strong> Built dynamic web apps using Flask/Django with responsive UIs (HTML, CSS, Bootstrap, JS).</li>
+                    <li><strong>Database Integration:</strong> Implemented secure connectivity and data management using MySQL and SQLite.</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .social-btn {
+        padding: 8px 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        text-decoration: none; font-size: 14px; font-weight: 600; color: var(--text-primary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .social-btn:hover {
+        background: var(--green-glow);
+        border-color: var(--green);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(34,197,94,0.15);
+    }
+
+    .section-title {
+        font-size: 18px; 
+        font-weight: 700; 
+        margin-bottom: 20px; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+    }
+
+    .detail-card {
+        transition: all 0.3s ease;
+    }
+    .detail-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 20px;
+        border-left: 2px solid var(--green-glow);
+        margin-bottom: 20px;
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -5px;
+        top: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px var(--green);
+    }
+    .timeline-title { font-weight: 700; color: var(--text-primary); font-size: 15px; }
+    .timeline-subtitle { font-size: 14px; color: var(--green-light); margin: 4px 0; }
+    .timeline-date { font-size: 12px; color: var(--text-muted); }
+
+    .skill-group {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    .skill-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        width: 120px;
+        flex-shrink: 0;
+    }
+    .skill-value {
+        color: var(--text-primary);
+    }
+
+    .bullet-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .bullet-list li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+    }
+    .bullet-list li::before {
+        content: '▹';
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: var(--green);
+        font-size: 16px;
+    }
+    .bullet-list li strong {
+        color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+        .founder-hero { flex-direction: column; text-align: center; }
+        .social-links { justify-content: center; }
+        div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+        .skill-group { flex-direction: column; gap: 4px; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Upload CSV{% endblock %}
+{% block nav_upload %}active{% endblock %}
+{% block page_title %}<span>📂</span> Upload CSV{% endblock %}
+
+{% block content %}
+
+<div style="max-width:600px;margin:0 auto;">
+
+  {% if message %}
+  <div class="alert alert-success">{{ message }}</div>
+  {% endif %}
+
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  {% if form.file.errors %}
+  <div class="alert alert-error">{{ form.file.errors|join:", " }}</div>
+  {% endif %}
+
+  <div class="card">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:6px;">Batch Prediction Upload</h2>
+    <p style="color:#64748b;font-size:14px;margin-bottom:28px;">
+      Upload a CSV file with columns:
+      <code style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:5px;">temperature, rainfall, humidity</code>
+    </p>
+
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+      {% csrf_token %}
+
+      <div id="dropZone"
+        style="
+          border: 2px dashed rgba(34,197,94,0.3);
+          border-radius: 14px;
+          padding: 48px 24px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          margin-bottom: 20px;
+          background: rgba(34,197,94,0.03);
+        "
+        onclick="document.getElementById('fileInput').click()"
+        ondragover="this.style.borderColor='#22c55e';this.style.background='rgba(34,197,94,0.08)';event.preventDefault();"
+        ondragleave="this.style.borderColor='rgba(34,197,94,0.3)';this.style.background='rgba(34,197,94,0.03)';"
+        ondrop="handleDrop(event)">
+        <div id="dropIcon" style="font-size:48px;margin-bottom:12px;">📂</div>
+        <div style="font-weight:600;font-size:16px;margin-bottom:6px;">Drop your CSV file here</div>
+        <div style="font-size:13px;color:#64748b;" id="fileLabel">or click to browse</div>
+      </div>
+
+      {{ form.file }}
+
+      <button type="submit" class="btn btn-primary" id="uploadBtn"
+              style="width:100%;justify-content:center;padding:14px;font-size:15px;">
+        📤 Upload &amp; Process
+      </button>
+    </form>
+  </div>
+
+  <!-- Sample format -->
+  <div class="card" style="margin-top:20px;">
+    <div class="card-title" style="margin-bottom:14px;">Sample CSV Format</div>
+    <pre style="
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 13px;
+      color: #4ade80;
+      overflow-x: auto;
+      line-height: 1.8;
+    ">temperature,rainfall,humidity
+28.5,150.0,65.0
+35.2,80.0,45.0
+22.0,210.0,80.0
+25.0,120.0,55.0</pre>
+    <p style="font-size:12px;color:#475569;margin-top:12px;">
+      ⚠️ Maximum file size: <strong>5 MB</strong>. All predictions will be saved to your history.
+    </p>
+  </div>
+
+</div>
+
+<script>
+function handleDrop(e) {
+  e.preventDefault();
+  const files = e.dataTransfer.files;
+  if (files.length) {
+    document.getElementById('fileInput').files = files;
+    updateLabel(files[0].name);
+  }
+  e.currentTarget.style.borderColor = 'rgba(34,197,94,0.3)';
+  e.currentTarget.style.background  = 'rgba(34,197,94,0.03)';
+}
+
+document.getElementById('fileInput').addEventListener('change', function() {
+  if (this.files[0]) updateLabel(this.files[0].name);
+});
+
+function updateLabel(name) {
+  document.getElementById('fileLabel').textContent = '✅ ' + name;
+  document.getElementById('dropIcon').textContent  = '📄';
+}
+
+document.getElementById('uploadForm').addEventListener('submit', function() {
+  const btn = document.getElementById('uploadBtn');
+  btn.textContent = '⏳ Processing…';
+  btn.disabled = true;
+});
+</script>
+
+{% endblock %}
