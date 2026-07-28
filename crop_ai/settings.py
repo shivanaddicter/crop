@@ -10,10 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key")
 
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    ".onrender.com,127.0.0.1,localhost"
+).split(",")
 
 # APPLICATIONS
 INSTALLED_APPS = [
@@ -31,7 +35,9 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',   # MUST be above auth
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -93,8 +99,10 @@ USE_TZ = True
 
 
 # STATIC FILES (CSS, JS)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # MEDIA FILES (CSV UPLOAD SUPPORT)
 MEDIA_URL = '/media/'
